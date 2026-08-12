@@ -1,3 +1,4 @@
+USE futbol;
 
 -- ej 1 
 SELECT * FROM futbol.jugador;
