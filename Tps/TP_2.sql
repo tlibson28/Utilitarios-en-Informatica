@@ -110,20 +110,41 @@ SELECt * FROM pacientes;
 
 UPDATE act_int a
 INNER JOIN internacion i ON a.codpac = i.codpac
-SET a.internado = IF(i.fecalt IS NULL, 1, 0);alter
+SET a.internado = IF(i.fecalt IS NULL, 1, 0);
 
 -- c)
 
+CREATE VIEW int_pac2 AS
+SELECT * FROM int_pac1
+WHERE localidad = 'Capital';
+        
+
+-- d) 
 
 
+CREATE VIEW a_pagar1 AS
+SELECT 
+		p.apellido,
+		p.nombre,
+        o.nomoso,
+        i.habitacion,
+        DATEDIFF(i.fecalt, i.fecint),
+        pr.precio AS precio_int,
+        o.des_int,
+        i.remedios, 
+        o.des_rem,
+        (pr.precio *  (100 + o.des_int) / 100) + (i.remedios *  (100 + o.des_rem) / 100) AS tot_pagar
+FROM pacientes p 
+INNER JOIN internacion i 
+ON p.codpac = i.codpac
+INNER JOIN precios pr
+ON i.claseh = pr.claseh
+INNER JOIN obraso o 
+ON p.codoso = o.codoso
+WHERE p.apellido = 'Gomez';
 
 
-
-
-
-
-
-
+DROP VIEW a_pagar1
 
 
 
