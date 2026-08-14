@@ -128,12 +128,12 @@ SELECT
 		p.nombre,
         o.nomoso,
         i.habitacion,
-        DATEDIFF(i.fecalt, i.fecint),
+        DATEDIFF(i.fecalt, i.fecint) AS Dias_de_internacion,
         pr.precio AS precio_int,
         o.des_int,
         i.remedios, 
         o.des_rem,
-        (pr.precio *  (100 + o.des_int) / 100) + (i.remedios *  (100 + o.des_rem) / 100) AS tot_pagar
+        (pr.precio *  (100 - o.des_int) / 100) + (i.remedios *  (100 - o.des_rem) / 100) AS tot_pagar
 FROM pacientes p 
 INNER JOIN internacion i 
 ON p.codpac = i.codpac
@@ -143,17 +143,45 @@ INNER JOIN obraso o
 ON p.codoso = o.codoso
 WHERE p.apellido = 'Gomez';
 
+DROP VIEW a_pagar1; 
 
-DROP VIEW a_pagar1
+-- e) 
+
+CREATE VIEW a_pagar2 AS
+SELECT 
+		i.est_alta,
+		p.apellido,
+		p.nombre,
+        DATEDIFF(CURDATE(), i.fecint) AS Dias_de_internacion,
+        pr.precio AS precio_int,
+        i.remedios, 
+        (pr.precio *  (100 - o.des_int) / 100) + (i.remedios *  (100 - o.des_rem) / 100) AS tot_pagar
+FROM pacientes p 
+INNER JOIN internacion i 
+ON p.codpac = i.codpac
+INNER JOIN precios pr
+ON i.claseh = pr.claseh
+INNER JOIN obraso o 
+ON p.codoso = o.codoso
+WHERE p.internado = 1; 
 
 
+-- --------------------------------
+-- CONSULTAS EN TABLAS REALCIONADAS
+-- --------------------------------
+
+-- a) 
 
 
-
-
-
-
-
+CREATE VIEW ref_cruz1 AS
+SELECT 
+        LEFT(i.habitacion, 1) AS piso,
+        COUNT(IF(p.sexo = 'M', 1, NULL)) AS hombres,
+        COUNT(IF(p.sexo = 'F', 1, NULL)) AS mujeres
+FROM pacientes p 
+INNER JOIN internacion i 
+ON p.codpac = i.codpac
+GROUP BY piso;
 
 
 
